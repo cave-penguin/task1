@@ -1,4 +1,6 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
+
 import Head from './head'
 
 const Dummy = () => (
@@ -9,6 +11,10 @@ const Dummy = () => (
         <div className="mb-4">
           <h1 className="text-grey-darkest">Todo List</h1>
           <div className="flex mt-4">
+            <Link to="/dashboard">GO To Dashboard</Link>
+            <div>
+              <a href="/dashboard">GO To Dashboard</a>
+            </div>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 mr-4 text-grey-darker"
               placeholder="Add Todo"

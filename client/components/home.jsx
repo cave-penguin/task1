@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+
 import Head from './head'
+
 // import wave from '../assets/images/wave.jpg'
 
 const Home = () => {
@@ -12,7 +15,11 @@ const Home = () => {
       <button type="button" onClick={() => setCounterNew(counter + 1)}>
         updateCounter
       </button>
-      <div> Hello World Dashboard {counter} </div>
+      <div>
+        Hello World Dashboard {counter}
+        <Link to="/">GO To Root</Link>
+        <a href="/">GO To Dashboard</a>
+      </div>
     </div>
   )
 }

@@ -21,6 +21,8 @@ try {
 
 let connections = []
 
+// const { readFile, writeFile, stat, unlink } = require('fs').promises
+
 const port = process.env.PORT || 8090
 const server = express()
 
@@ -33,6 +35,12 @@ const middleware = [
 ]
 
 middleware.forEach((it) => server.use(it))
+
+server.use(cookieParser())
+
+server.get('/api/v1/users', (req, res) => {
+  res.json({ name: 'mike' })
+})
 
 server.use('/api/', (req, res) => {
   res.status(404)
