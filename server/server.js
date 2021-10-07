@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
+const { readFile, writeFile, stat, unlink } = require('fs').promises
+
 require('colors')
 
 let Root
@@ -20,8 +22,6 @@ try {
 }
 
 let connections = []
-
-// const { readFile, writeFile, stat, unlink } = require('fs').promises
 
 const port = process.env.PORT || 8090
 const server = express()
