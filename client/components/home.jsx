@@ -15,11 +15,7 @@ const Home = () => {
       <button type="button" onClick={() => setCounterNew(counter + 1)}>
         updateCounter
       </button>
-      <div>
-        Hello World Dashboard {counter}
-        <Link to="/">GO To Root</Link>
-        <a href="/">GO To Dashboard</a>
-      </div>
+      <div>Hello World Dashboard {counter}</div>
     </div>
   )
 }
