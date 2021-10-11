@@ -75,7 +75,7 @@ server.post('/api/v1/users', async (req, res) => {
     .then(async (text) => {
       const parsedText = JSON.parse(text)
       const lastUserId = parsedText[parsedText.length - 1].id
-      const newBody = [...parsedText, { ...req.body, id: `${lastUserId + 1}` }]
+      const newBody = [...parsedText, { ...req.body, id: lastUserId + 1 }]
       await writeFileUsers(newBody)
       return { status: 'success', id: newBody[newBody.length - 1].id }
     })
