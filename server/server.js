@@ -55,9 +55,9 @@ server.get('/api/v1/users', async (req, res) => {
       return JSON.parse(text)
     })
     .catch(async () => {
-      const newUsers = await axios(getPlaceholder)
-      await writeFileUsers(newUsers)
-      return newUsers
+      const { data } = await axios(getPlaceholder)
+      await writeFileUsers(data)
+      return data
     })
   res.json(userList)
 })
