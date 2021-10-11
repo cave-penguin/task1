@@ -39,7 +39,7 @@ const middleware = [
   express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }),
   express.json({ limit: '50mb', extended: true }),
   cookieParser(),
-  setHeaders
+  setHeaders()
 ]
 
 middleware.forEach((it) => server.use(it))
