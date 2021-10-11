@@ -49,8 +49,6 @@ const getPlaceholder = 'https://jsonplaceholder.typicode.com/users'
 const readFileUsers = () => readFile(addFileTo, { encoding: 'utf-8' })
 const writeFileUsers = (usersFile) => writeFile(addFileTo, JSON.stringify(usersFile), 'utf-8')
 
-server.use(cookieParser())
-
 server.get('/api/v1/users', async (req, res) => {
   const userList = await readFileUsers()
     .then((text) => {
@@ -58,13 +56,7 @@ server.get('/api/v1/users', async (req, res) => {
     })
     .catch(async () => {
       const newUsers = await axios(getPlaceholder)
-        .then(({ data }) => {
-          writeFileUsers(data)
-          return data
-        })
-        .catch(() => {
-          res.json({ status: 'Error' })
-        })
+      writeFileUsers(newUsers)
       return newUsers
     })
   res.json(userList)
