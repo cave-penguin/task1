@@ -59,6 +59,9 @@ server.get('/api/v1/users', async (req, res) => {
       await writeFileUsers(data)
       return data
     })
+    .catch(() => {
+      return []
+    })
   res.json(userList)
 })
 
