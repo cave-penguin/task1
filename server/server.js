@@ -80,7 +80,7 @@ server.post('/api/v1/users', async (req, res) => {
       return { status: 'success', id: newBody[newBody.length - 1].id }
     })
     .catch(async () => {
-      const user = { ...req.body, id: 1 }
+      const user = [{ ...req.body, id: 1 }]
       await writeFileUsers(user)
       return { status: 'success', id: user.id }
     })
