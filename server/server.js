@@ -56,7 +56,7 @@ server.get('/api/v1/users', async (req, res) => {
     })
     .catch(async () => {
       const newUsers = await axios(getPlaceholder)
-      writeFileUsers(newUsers)
+      await writeFileUsers(newUsers)
       return newUsers
     })
   res.json(userList)
