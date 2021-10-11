@@ -111,15 +111,15 @@ server.delete('/api/v1/users/:userId', async (req, res) => {
     .then(async (str) => {
       const parsedStr = JSON.parse(str)
       const filteredParsedStr = parsedStr.filter((obj) => {
-        return obj.id !== +userId
+        return +userId !== obj.id
       })
       await writeFileUsers(filteredParsedStr)
-      res.json({ status: 'success', id: userId })
+      return { status: 'success', id: userId }
     })
     .catch(() => {
-      res.json({ status: 'no file' })
+      return { status: 'no file' }
     })
-  return userList
+  res.json(userList)
 })
 
 server.delete('/api/v1/users', (req, res) => {
