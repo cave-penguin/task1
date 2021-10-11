@@ -4,12 +4,13 @@ import cors from 'cors'
 import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
+import axios from 'axios'
 
 import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
-const { readFile, writeFile, stat, unlink } = require('fs').promises
+const { readFile, writeFile, unlink } = require('fs').promises
 
 require('colors')
 
@@ -26,20 +27,109 @@ let connections = []
 const port = process.env.PORT || 8090
 const server = express()
 
+const setHeaders = (req, res, next) => {
+  res.set('x-skillcrucial-user', '385666b1-bff5-11e9-95ba-1bf845c18f8d')
+  res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')
+  next()
+}
+
 const middleware = [
   cors(),
   express.static(path.resolve(__dirname, '../dist/assets')),
   express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }),
   express.json({ limit: '50mb', extended: true }),
-  cookieParser()
+  cookieParser(),
+  setHeaders
 ]
 
 middleware.forEach((it) => server.use(it))
 
+const addFileTo = `${__dirname}/data/test.json`
+const getPlaceholder = 'https://jsonplaceholder.typicode.com/users'
+const readFileUsers = () => readFile(addFileTo, { encoding: 'utf-8' })
+const writeFileUsers = (usersFile) => writeFile(addFileTo, JSON.stringify(usersFile), 'utf-8')
+
 server.use(cookieParser())
 
-server.get('/api/v1/users', (req, res) => {
-  res.json({ name: 'mike' })
+server.get('/api/v1/users', async (req, res) => {
+  const userList = await readFileUsers()
+    .then((text) => {
+      return JSON.parse(text)
+    })
+    .catch(async () => {
+      const newUsers = await axios(getPlaceholder)
+        .then(({ data }) => {
+          writeFileUsers(data)
+          return data
+        })
+        .catch(() => {
+          res.json({ status: 'Error' })
+        })
+      return newUsers
+    })
+  res.json(userList)
+})
+
+server.post('/api/v1/users', async (req, res) => {
+  const file = await readFileUsers()
+    .then(async (text) => {
+      const parsedText = JSON.parse(text)
+      const lastUserId = parsedText[parsedText.length - 1].id
+      const newBody = [...parsedText, { ...req.body, id: `${lastUserId + 1}` }]
+      await writeFileUsers(newBody)
+      return { status: 'success', id: newBody[newBody.length - 1].id }
+    })
+    .catch(async () => {
+      const user = { ...req.body, id: 1 }
+      await writeFileUsers(user)
+      return { status: 'success', id: user.id }
+    })
+  res.json(file)
+})
+
+server.patch('/api/v1/users/:userId', async (req, res) => {
+  const { userId } = req.params
+  const updateBody = { ...req.body, id: +userId }
+  const response = await readFileUsers()
+    .then(async (text) => {
+      const parsedText = JSON.parse(text)
+      const updatedList = parsedText.map((obj) => {
+        return obj.id === userId ? { ...obj, updateBody } : obj
+      })
+      await writeFileUsers(updatedList)
+      return { status: 'success', id: +userId }
+    })
+    .catch(() => {
+      return { status: 'No file', id: +userId }
+    })
+  res.json(response)
+})
+
+server.delete('/api/v1/users/:userId', async (req, res) => {
+  const { userId } = req.params
+  const userList = await readFileUsers()
+    .then(async (str) => {
+      const parsedStr = JSON.parse(str)
+      const filteredParsedStr = parsedStr.filter((obj) => {
+        return obj.id !== +userId
+      })
+      await writeFileUsers(filteredParsedStr)
+      res.json({ status: 'success', id: userId })
+    })
+    .catch(() => {
+      res.json({ status: 'no file' })
+    })
+  return userList
+})
+
+server.delete('/api/v1/users', (req, res) => {
+  unlink(addFileTo)
+    .then(() => {
+      res.json({ status: 'file was deleted' })
+    })
+    .catch(() => {
+      res.json({ status: 'no file' })
+    })
 })
 
 server.use('/api/', (req, res) => {
