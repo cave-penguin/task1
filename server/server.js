@@ -94,13 +94,13 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
     .then(async (text) => {
       const parsedText = JSON.parse(text)
       const updatedList = parsedText.map((obj) => {
-        return obj.id === +userId ? { ...obj, updateBody } : obj
+        return obj.id === +userId ? { ...obj, ...updateBody } : obj
       })
       await writeFileUsers(updatedList)
-      return { status: 'success', id: +userId }
+      return { status: 'success', id: userId }
     })
     .catch(() => {
-      return { status: 'No file', id: +userId }
+      return { status: 'No file', id: userId }
     })
   res.json(response)
 })
